@@ -179,6 +179,12 @@ pipeline {
         }
 
       }
+       when {
+          anyOf {
+            branch 'develop'
+          }
+
+        }
       post {
         always {
           junit 'target/failsafe-reports/**/*.xml'
@@ -197,6 +203,14 @@ pipeline {
     }
 
     stage('Push to git') {
+      
+       when {
+          anyOf {
+            branch 'develop'
+          }
+
+        }
+      
       steps {
         sh '''
             pwd
