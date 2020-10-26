@@ -31,8 +31,6 @@ pipeline {
               reuseNode true
             }
           }
-         
-          
           steps {
             sh ' mvn checkstyle:checkstyle'
             step([$class: 'CheckStylePublisher',
@@ -129,52 +127,47 @@ pipeline {
       }
     }
 
-    stage('Deployment (Docker)') {
-      parallel {
-        stage('Deployment (Docker)') {
+
+        stage('packaging (Docker)') {
           agent {
             docker {
               image 'maven:3.6.0-jdk-8-alpine'
               args '-v /root/.m2/repository:/root/.m2/repository'
+             reuseNode true
             }
-
           }
           post {
             always {
               junit 'target/failsafe-reports/**/*.xml'
             }
-
             success {
               stash(name: 'artifact', includes: 'target/*.war')
               stash(name: 'pom', includes: 'pom.xml')
               archiveArtifacts 'target/*.war'
             }
-
           }
           steps {
             sh 'mvn verify -Dsurefire.skip=true'
           }
         }
-
+    stage('Deployment (Docker)') {
+      parallel {
         stage('UAT') {
           agent {
             dockerfile {
               filename 'app/Dockerfile'
             }
-
           }
           steps {
             sh '''pwd
-find / name \'demo-0.0.1-SNAPSHOT.war\''''
+            find / name \'demo-0.0.1-SNAPSHOT.war\''''
           }
         }
-
         stage('Staging') {
           steps {
             sh 'echo \'staging\''
           }
         }
-
       }
     }
 
