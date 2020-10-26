@@ -32,6 +32,13 @@ pipeline {
             }
 
           }
+          
+          when {
+          anyOf {
+            branch 'develop'
+          }
+
+        }
           steps {
             sh ' mvn checkstyle:checkstyle'
             step([$class: 'CheckStylePublisher',
