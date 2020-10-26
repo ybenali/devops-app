@@ -12,7 +12,7 @@ pipeline {
         docker {
           image 'maven:3.6.0-jdk-8-alpine'
           args '-v /root/.m2/repository:/root/.m2/repository'
-          -p 3011:3011
+          args '-p 3011:3011'
           reuseNode true
         }
       }
