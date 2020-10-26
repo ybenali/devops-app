@@ -1,6 +1,6 @@
 FROM tomcat:latest
 USER root
-RUN chmod 777 target
+RUN chmod 777 /var/jenkins_home/workspace/devops-app_main/target/
 WORKDIR  target
 COPY demo-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/
 WORKDIR  /usr/local/tomcat/bin
