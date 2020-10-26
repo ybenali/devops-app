@@ -47,13 +47,13 @@ pipeline {
           steps {
             sh ' mvn checkstyle:checkstyle'
             step([$class: 'CheckStylePublisher',
-                                                                                                                               //canRunOnFailed: true,
-                                                                                                                               defaultEncoding: '',
-                                                                                                                               healthy: '100',
-                                                                                                                               pattern: '**/target/checkstyle-result.xml',
-                                                                                                                               unHealthy: '90',
-                                                                                                                               //useStableBuildAsReference: true
-                                                                                                                              ])
+                                                                                                                                           //canRunOnFailed: true,
+                                                                                                                                           defaultEncoding: '',
+                                                                                                                                           healthy: '100',
+                                                                                                                                           pattern: '**/target/checkstyle-result.xml',
+                                                                                                                                           unHealthy: '90',
+                                                                                                                                           //useStableBuildAsReference: true
+                                                                                                                                          ])
           }
         }
 
@@ -252,10 +252,7 @@ git push https://ybenali:Welcomecpt2020@github.com/ybenali/devops-app.git
 
     stage('Tools Deployment [Docker]') {
       steps {
-        sh '''wget  -O Dynatrace-OneAgent-Linux-1.203.166.sh "https://yyl00213.live.dynatrace.com/api/v1/deployment/installer/agent/unix/default/latest?arch=x86&flavor=default" --header="Authorization: Api-Token rNVzbAFwT6SnOvx2ehmVR"
-
-
-/bin/sh Dynatrace-OneAgent-Linux-1.203.166.sh  
+        sh '''docker run -d --restart=unless-stopped --privileged=true --pid=host --net=host --ipc=host -v /:/mnt/root -e ONEAGENT_INSTALLER_SCRIPT_URL=https://yyl00213.live.dynatrace.com/api/v1/deployment/installer/agent/unix/default/latest?arch=x86&flavor=default   -e ONEAGENT_INSTALLER_DOWNLOAD_TOKEN=rNVzbAFwT6SnOvx2ehmVR dynatrace/oneagent --set-app-log-content-access=true
 '''
       }
     }
