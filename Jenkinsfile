@@ -157,6 +157,7 @@ pipeline {
             dockerfile {
               filename 'app/Dockerfile'
             }
+          reuseNode true
           }
           steps {
             sh '''pwd
