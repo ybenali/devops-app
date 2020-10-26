@@ -16,7 +16,7 @@ pipeline {
     to obtains this address : $ docker-machine ip
     Linux: set localhost to SONARQUBE_URL
   */
-  SONARQUBE_URL = "http://192.168.99.100"
+  SONARQUBE_URL = "http://10.66.12.219"
   SONARQUBE_PORT = "9000"
  }
  options {
