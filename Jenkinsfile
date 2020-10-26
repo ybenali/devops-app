@@ -144,15 +144,12 @@ pipeline {
      }
     }
    }
-   //post {
-    //always {
-     // using warning next gen plugin
-    // recordIssues aggregatingResults: true, tools: [javaDoc(), checkStyle(pattern: '**/target/checkstyle-result.xml'), findBugs(pattern: '**/target/findbugsXml.xml', useRankAsPriority: true), pmdParser(pattern: '**/target/pmd.xml')]
-   // }
-   //}
-  }
-  
-  
+   post {
+    always {
+     recordIssues aggregatingResults: true, tools: [javaDoc(), checkStyle(pattern: '**/target/checkstyle-result.xml'), findBugs(pattern: '**/target/findbugsXml.xml', useRankAsPriority: true), pmdParser(pattern: '**/target/pmd.xml')]
+    }
+   }
+  } 
   stage('Selenium test') {
     parallel {
       stage('Opera') {
@@ -160,49 +157,41 @@ pipeline {
           docker {
             image 'selenium_node-side'
           }
-
         }
         when {
           anyOf {
             branch 'develop'
           }
-
         }
         steps {
           sh 'selenium-side-runner -s http://10.66.12.219:4444/wd/hub -c "browserName=\'operablink\' version=\'71.0.3770.228\' platform=\'LINUX\'" Selenium/testchrome.side'
         }
       }
-
       stage('Firefox') {
         agent {
           docker {
             image 'selenium_node-side'
           }
-
         }
         when {
           anyOf {
             branch 'develop'
           }
-
         }
         steps {
           sh 'selenium-side-runner -s http://10.66.12.219:4444/wd/hub -c "browserName=\'firefox\' version=\'81.0.1\' platform=\'LINUX\'"  Selenium/testchrome.side'
         }
       }
-
       stage('Chrome') {
         agent {
           docker {
             image 'selenium_node-side'
           }
-
         }
         when {
           anyOf {
             branch 'develop'
           }
-
         }
         steps {
           sh '''pwd
@@ -210,9 +199,7 @@ selenium-side-runner -s http://10.66.12.219:4444/wd/hub -c "browserName=\'chrome
 '''
         }
       }
-
     }
   }
-
  }
 }
