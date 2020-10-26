@@ -1,24 +1,5 @@
 pipeline {
  agent any
- environment {
-  // This can be nexus3 or nexus2
-  //NEXUS_VERSION = "nexus3"
-  // This can be http or https
-  //NEXUS_PROTOCOL = "http"
-  // Where your Nexus is running. In my case:
-  //NEXUS_URL = "ec2-52-212-29-159.eu-west-1.compute.amazonaws.com:8081"
-  // Repository where we will upload the artifact
-  //NEXUS_REPOSITORY = "maven-snapshots"
-  // Jenkins credential id to authenticate to Nexus OSS
-  //NEXUS_CREDENTIAL_ID = "nexus-credentials"
-  /* 
-    Windows: set the ip address of docker host. In my case 192.168.99.100.
-    to obtains this address : $ docker-machine ip
-    Linux: set localhost to SONARQUBE_URL
-  */
-  SONARQUBE_URL = "http://10.66.12.219"
-  SONARQUBE_PORT = "9000"
- }
  options {
   skipDefaultCheckout()
  }
@@ -159,7 +140,7 @@ pipeline {
       }
      }
      steps {
-      sh " mvn sonar:sonar -Dsonar.host.url=$SONARQUBE_URL:$SONARQUBE_PORT"
+      sh " mvn sonar:sonar -Dsonar.host.url=http://10.66.12.219:9000"
      }
     }
    }
@@ -170,5 +151,68 @@ pipeline {
     }
    }
   }
+  
+  
+  stage('Selenium test') {
+    parallel {
+      stage('Opera') {
+        agent {
+          docker {
+            image 'selenium_node-side'
+          }
+
+        }
+        when {
+          anyOf {
+            branch 'develop'
+          }
+
+        }
+        steps {
+          sh 'selenium-side-runner -s http://10.66.12.219:4444/wd/hub -c "browserName=\'operablink\' version=\'71.0.3770.228\' platform=\'LINUX\'" Selenium/testchrome.side'
+        }
+      }
+
+      stage('Firefox') {
+        agent {
+          docker {
+            image 'selenium_node-side'
+          }
+
+        }
+        when {
+          anyOf {
+            branch 'develop'
+          }
+
+        }
+        steps {
+          sh 'selenium-side-runner -s http://10.66.12.219:4444/wd/hub -c "browserName=\'firefox\' version=\'81.0.1\' platform=\'LINUX\'"  Selenium/testchrome.side'
+        }
+      }
+
+      stage('Chrome') {
+        agent {
+          docker {
+            image 'selenium_node-side'
+          }
+
+        }
+        when {
+          anyOf {
+            branch 'develop'
+          }
+
+        }
+        steps {
+          sh '''pwd
+selenium-side-runner -s http://10.66.12.219:4444/wd/hub -c "browserName=\'chrome\' version=\'86.0.4240.75\' platform=\'LINUX\'"  Selenium/testchrome.side
+'''
+        }
+      }
+
+    }
+  }
+
  }
 }
