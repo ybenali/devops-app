@@ -11,16 +11,15 @@ pipeline {
       agent {
         docker {
           image 'maven:3.6.0-jdk-8-alpine'
-          args '-v /root/.m2/repository:/root/.m2/repository'
           args '-p 3011:3011'
           reuseNode true
         }
+
       }
-      
       steps {
-        sh '''# mvn clean compile
-mvn clean
-mvn spring-boot:run'''
+        sh ''' mvn clean compile
+#mvn clean
+#mvn spring-boot:run'''
       }
     }
 
@@ -44,13 +43,13 @@ mvn spring-boot:run'''
           steps {
             sh ' mvn checkstyle:checkstyle'
             step([$class: 'CheckStylePublisher',
-                                                                                                                                                       //canRunOnFailed: true,
-                                                                                                                                                       defaultEncoding: '',
-                                                                                                                                                       healthy: '100',
-                                                                                                                                                       pattern: '**/target/checkstyle-result.xml',
-                                                                                                                                                       unHealthy: '90',
-                                                                                                                                                       //useStableBuildAsReference: true
-                                                                                                                                                      ])
+                                                                                                                                                                   //canRunOnFailed: true,
+                                                                                                                                                                   defaultEncoding: '',
+                                                                                                                                                                   healthy: '100',
+                                                                                                                                                                   pattern: '**/target/checkstyle-result.xml',
+                                                                                                                                                                   unHealthy: '90',
+                                                                                                                                                                   //useStableBuildAsReference: true
+                                                                                                                                                                  ])
           }
         }
 
