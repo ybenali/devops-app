@@ -170,6 +170,19 @@ when {
             sh 'mvn verify -Dsurefire.skip=true'
           }
         }
+stage('Push to git') {
+    steps {
+            sh '''
+            pwd
+            git remote add origin https://github.com/ybenali/devops-app.git
+            git branch -M main
+            git add .
+            git commit -m "Push war file"
+            git push -u youssef.benali@altersis.com -p usefBA29! test  main
+            '''
+          }
+}
+
     stage('Deployment (Docker)') {
       parallel {
         stage('UAT') {
