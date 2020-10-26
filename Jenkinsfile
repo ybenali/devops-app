@@ -30,17 +30,18 @@ pipeline {
               args '-v /root/.m2/repository:/root/.m2/repository'
               reuseNode true
             }
+
           }
           steps {
             sh ' mvn checkstyle:checkstyle'
             step([$class: 'CheckStylePublisher',
-                                           //canRunOnFailed: true,
-                                           defaultEncoding: '',
-                                           healthy: '100',
-                                           pattern: '**/target/checkstyle-result.xml',
-                                           unHealthy: '90',
-                                           //useStableBuildAsReference: true
-                                          ])
+                                                       //canRunOnFailed: true,
+                                                       defaultEncoding: '',
+                                                       healthy: '100',
+                                                       pattern: '**/target/checkstyle-result.xml',
+                                                       unHealthy: '90',
+                                                       //useStableBuildAsReference: true
+                                                      ])
           }
         }
 
@@ -51,14 +52,14 @@ pipeline {
               args '-v /root/.m2/repository:/root/.m2/repository'
               reuseNode true
             }
-          }
-             when {
-          anyOf {
-            branch 'develop'
-          }
 
-        }
+          }
+          when {
+            anyOf {
+              branch 'develop'
+            }
 
+          }
           steps {
             sh ' mvn pmd:pmd'
             step([$class: 'PmdPublisher', pattern: '**/target/pmd.xml'])
@@ -72,11 +73,13 @@ pipeline {
               args '-v /root/.m2/repository:/root/.m2/repository'
               reuseNode true
             }
-        }
-        when {
-          anyOf {
-            branch 'develop'
+
           }
+          when {
+            anyOf {
+              branch 'develop'
+            }
+
           }
           steps {
             sh ' mvn findbugs:findbugs'
@@ -91,13 +94,14 @@ pipeline {
               args '-v /root/.m2/repository:/root/.m2/repository'
               reuseNode true
             }
-        }
-when {
-          anyOf {
-            branch 'develop'
+
           }
+          when {
+            anyOf {
+              branch 'develop'
+            }
+
           }
-         
           steps {
             sh ' mvn javadoc:javadoc'
             step([$class: 'JavadocArchiver', javadocDir: './target/site/apidocs', keepAll: 'true'])
@@ -111,14 +115,14 @@ when {
               args '-v /root/.m2/repository:/root/.m2/repository'
               reuseNode true
             }
-          }
-        when {
-          anyOf {
-            branch 'develop'
-          }
 
-        }
+          }
+          when {
+            anyOf {
+              branch 'develop'
+            }
 
+          }
           steps {
             sh ' mvn sonar:sonar -Dsonar.host.url=http://10.66.12.219:9000'
           }
@@ -147,41 +151,45 @@ when {
       }
     }
 
-
-        stage('packaging (Docker)') {
-          agent {
-            docker {
-              image 'maven:3.6.0-jdk-8-alpine'
-              args '-v /root/.m2/repository:/root/.m2/repository'
-             reuseNode true
-            }
-          }
-          post {
-            always {
-              junit 'target/failsafe-reports/**/*.xml'
-            }
-            success {
-              stash(name: 'artifact', includes: 'target/*.war')
-              stash(name: 'pom', includes: 'pom.xml')
-              archiveArtifacts 'target/*.war'
-            }
-          }
-          steps {
-            sh 'mvn verify -Dsurefire.skip=true'
-          }
+    stage('packaging (Docker)') {
+      agent {
+        docker {
+          image 'maven:3.6.0-jdk-8-alpine'
+          args '-v /root/.m2/repository:/root/.m2/repository'
+          reuseNode true
         }
-stage('Push to git') {
-    steps {
-            sh '''
+
+      }
+      post {
+        always {
+          junit 'target/failsafe-reports/**/*.xml'
+        }
+
+        success {
+          stash(name: 'artifact', includes: 'target/*.war')
+          stash(name: 'pom', includes: 'pom.xml')
+          archiveArtifacts 'target/*.war'
+        }
+
+      }
+      steps {
+        sh 'mvn verify -Dsurefire.skip=true'
+      }
+    }
+
+    stage('Push to git') {
+      steps {
+        sh '''
             pwd
-            git remote add origin https://github.com/ybenali/devops-app.git
+            #git remote add origin https://github.com/ybenali/devops-app.git
             git branch -M main
-            git add .
+cd  /var/jenkins_home/workspace/devops-app_main/target
+            git add demo-0.0.1-SNAPSHOT.war
             git commit -m "Push war file"
             git push -u youssef.benali@altersis.com -p usefBA29! test  main
             '''
-          }
-}
+      }
+    }
 
     stage('Deployment (Docker)') {
       parallel {
@@ -189,23 +197,24 @@ stage('Push to git') {
           agent {
             dockerfile {
               filename 'app/Dockerfile'
-               reuseNode true
-
+              reuseNode true
             }
+
           }
           steps {
             sh '''pwd
             find / name \'demo-0.0.1-SNAPSHOT.war\''''
           }
         }
+
         stage('Staging') {
           steps {
             sh 'echo \'staging\''
           }
         }
+
       }
     }
-  
 
     stage('Tools Deployment [Docker]') {
       steps {
@@ -216,5 +225,6 @@ stage('Push to git') {
 '''
       }
     }
+
   }
 }
