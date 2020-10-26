@@ -6,7 +6,7 @@ pipeline {
         checkout scm
       }
     }
-    stage('Compile') {
+    stage('Build') {
           agent {
             docker {
               image 'maven:3.6.0-jdk-8-alpine'
@@ -20,53 +20,7 @@ pipeline {
           }
         } 
 
-    stage('Unit Tests') {
-      agent {
-        docker {
-          image 'maven:3.6.0-jdk-8-alpine'
-          args '-v /root/.m2/repository:/root/.m2/repository'
-          reuseNode true
-        }
-
-      }
-      post {
-        always {
-          junit 'target/surefire-reports/**/*.xml'
-        }
-
-      }
-      steps {
-        sh 'mvn test'
-      }
-    }
-
-    stage('Integration Tests') {
-      agent {
-        docker {
-          image 'maven:3.6.0-jdk-8-alpine'
-          args '-v /root/.m2/repository:/root/.m2/repository'
-          reuseNode true
-        }
-
-      }
-      post {
-        always {
-          junit 'target/failsafe-reports/**/*.xml'
-        }
-
-        success {
-          stash(name: 'artifact', includes: 'target/*.war')
-          stash(name: 'pom', includes: 'pom.xml')
-          archiveArtifacts 'target/*.war'
-        }
-
-      }
-      steps {
-        sh 'mvn verify -Dsurefire.skip=true'
-      }
-    }
-
-    stage('Code Quality Analysis') {
+ stage('Code Quality Analysis') {
       post {
         always {
           recordIssues(aggregatingResults: true, tools: [javaDoc(), checkStyle(pattern: '**/target/checkstyle-result.xml'), findBugs(pattern: '**/target/findbugsXml.xml', useRankAsPriority: true), pmdParser(pattern: '**/target/pmd.xml')])
@@ -157,6 +111,57 @@ pipeline {
           }
         }
       }
+    }
+
+
+
+    stage('Unit Tests') {
+      agent {
+        docker {
+          image 'maven:3.6.0-jdk-8-alpine'
+          args '-v /root/.m2/repository:/root/.m2/repository'
+          reuseNode true
+        }
+
+      }
+      post {
+        always {
+          junit 'target/surefire-reports/**/*.xml'
+        }
+
+      }
+      steps {
+        sh 'mvn test'
+      }
+    }
+
+    stage('Integration Tests') {
+      agent {
+        docker {
+          image 'maven:3.6.0-jdk-8-alpine'
+          args '-v /root/.m2/repository:/root/.m2/repository'
+          reuseNode true
+        }
+
+      }
+      post {
+        always {
+          junit 'target/failsafe-reports/**/*.xml'
+        }
+
+        success {
+          stash(name: 'artifact', includes: 'target/*.war')
+          stash(name: 'pom', includes: 'pom.xml')
+          archiveArtifacts 'target/*.war'
+        }
+
+      }
+      steps {
+        sh 'mvn verify -Dsurefire.skip=true'
+      }
+    }
+
+   
    }
  }
 }
