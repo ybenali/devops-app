@@ -6,23 +6,24 @@ pipeline {
         checkout scm
       }
     }
+
     stage('Build') {
-          agent {
-            docker {
-              image 'maven:3.6.0-jdk-8-alpine'
-              args '-v /root/.m2/repository:/root/.m2/repository'
-              reuseNode true
-            }
+      agent {
+        docker {
+          image 'maven:3.6.0-jdk-8-alpine'
+          args '-v /root/.m2/repository:/root/.m2/repository'
+          reuseNode true
+        }
 
-          }
-          steps {
-            sh ' mvn clean compile'
-          }
-        } 
+      }
+      steps {
+        sh ' mvn clean compile'
+      }
+    }
 
- stage('Code Quality Analysis') {
-   parallel {
-    stage('CheckStyle') {
+    stage('Code Quality Analysis') {
+      parallel {
+        stage('CheckStyle') {
           agent {
             docker {
               image 'maven:3.6.0-jdk-8-alpine'
@@ -34,17 +35,15 @@ pipeline {
           steps {
             sh ' mvn checkstyle:checkstyle'
             step([$class: 'CheckStylePublisher',
-                   //canRunOnFailed: true,
-                   defaultEncoding: '',
-                   healthy: '100',
-                   pattern: '**/target/checkstyle-result.xml',
-                   unHealthy: '90',
-                   //useStableBuildAsReference: true
-                  ])
+                               //canRunOnFailed: true,
+                               defaultEncoding: '',
+                               healthy: '100',
+                               pattern: '**/target/checkstyle-result.xml',
+                               unHealthy: '90',
+                               //useStableBuildAsReference: true
+                              ])
           }
         }
-
-
 
         stage('PMD') {
           agent {
@@ -98,15 +97,15 @@ pipeline {
               args '-v /root/.m2/repository:/root/.m2/repository'
               reuseNode true
             }
+
           }
           steps {
             sh ' mvn sonar:sonar -Dsonar.host.url=http://10.66.12.219:9000'
           }
         }
+
       }
     }
-
-
 
     stage('Unit Tests') {
       agent {
@@ -128,31 +127,64 @@ pipeline {
       }
     }
 
-    stage('Integration Tests') {
-      agent {
-        docker {
-          image 'maven:3.6.0-jdk-8-alpine'
-          args '-v /root/.m2/repository:/root/.m2/repository'
-          reuseNode true
+    stage('Deployment (Docker)') {
+      parallel {
+        stage('Deployment (Docker)') {
+          agent {
+            docker {
+              image 'maven:3.6.0-jdk-8-alpine'
+              args '-v /root/.m2/repository:/root/.m2/repository'
+              reuseNode true
+            }
+
+          }
+          post {
+            always {
+              junit 'target/failsafe-reports/**/*.xml'
+            }
+
+            success {
+              stash(name: 'artifact', includes: 'target/*.war')
+              stash(name: 'pom', includes: 'pom.xml')
+              archiveArtifacts 'target/*.war'
+            }
+
+          }
+          steps {
+            sh 'mvn verify -Dsurefire.skip=true'
+          }
         }
 
-      }
-      post {
-        always {
-          junit 'target/failsafe-reports/**/*.xml'
+        stage('UAT') {
+          agent {
+            dockerfile {
+              filename 'app/Dockerfile'
+            }
+
+          }
+          steps {
+            sh 'echo \'UAT\''
+          }
         }
 
-        success {
-          stash(name: 'artifact', includes: 'target/*.war')
-          stash(name: 'pom', includes: 'pom.xml')
-          archiveArtifacts 'target/*.war'
+        stage('Staging') {
+          steps {
+            sh 'echo \'staging\''
+          }
         }
 
-      }
-      steps {
-        sh 'mvn verify -Dsurefire.skip=true'
       }
     }
-   
- }
+
+    stage('Tools Deployment [Docker]') {
+      steps {
+        sh '''wget  -O Dynatrace-OneAgent-Linux-1.203.166.sh "https://yyl00213.live.dynatrace.com/api/v1/deployment/installer/agent/unix/default/latest?arch=x86&flavor=default" --header="Authorization: Api-Token rNVzbAFwT6SnOvx2ehmVR"
+
+
+/bin/sh Dynatrace-OneAgent-Linux-1.203.166.sh  
+'''
+      }
+    }
+
+  }
 }
