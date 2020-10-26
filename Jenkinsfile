@@ -6,9 +6,7 @@ pipeline {
         checkout scm
       }
     }
-
-    stage('Build') {
-        stage('Compile') {
+    stage('Compile') {
           agent {
             docker {
               image 'maven:3.6.0-jdk-8-alpine'
@@ -20,12 +18,7 @@ pipeline {
           steps {
             sh ' mvn clean compile'
           }
-        }
-
-       
-
-    
-    }
+        } 
 
     stage('Unit Tests') {
       agent {
