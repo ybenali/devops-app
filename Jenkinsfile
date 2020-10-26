@@ -14,14 +14,8 @@ pipeline {
           args '-v /root/.m2/repository:/root/.m2/repository'
           reuseNode true
         }
-
       }
-      when {
-        anyOf {
-          branch 'develop'
-        }
-
-      }
+      
       steps {
         sh '''# mvn clean compile
 mvn clean
