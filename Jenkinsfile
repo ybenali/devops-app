@@ -16,7 +16,6 @@ pipeline {
       docker {
        image 'maven:3.6.0-jdk-8-alpine'
        args '-v /root/.m2/repository:/root/.m2/repository'
-       // to use the same node and workdir defined on top-level pipeline for all docker agents
        reuseNode true
       }
      }
@@ -158,11 +157,7 @@ pipeline {
             image 'selenium_node-side'
           }
         }
-        when {
-          anyOf {
-            branch 'develop'
-          }
-        }
+        
         steps {
           sh 'selenium-side-runner -s http://10.66.12.219:4444/wd/hub -c "browserName=\'operablink\' version=\'71.0.3770.228\' platform=\'LINUX\'" Selenium/testchrome.side'
         }
@@ -173,11 +168,7 @@ pipeline {
             image 'selenium_node-side'
           }
         }
-        when {
-          anyOf {
-            branch 'develop'
-          }
-        }
+       
         steps {
           sh 'selenium-side-runner -s http://10.66.12.219:4444/wd/hub -c "browserName=\'firefox\' version=\'81.0.1\' platform=\'LINUX\'"  Selenium/testchrome.side'
         }
@@ -188,11 +179,7 @@ pipeline {
             image 'selenium_node-side'
           }
         }
-        when {
-          anyOf {
-            branch 'develop'
-          }
-        }
+    
         steps {
           sh '''pwd
 selenium-side-runner -s http://10.66.12.219:4444/wd/hub -c "browserName=\'chrome\' version=\'86.0.4240.75\' platform=\'LINUX\'"  Selenium/testchrome.side
