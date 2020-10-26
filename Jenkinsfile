@@ -154,18 +154,11 @@ pipeline {
               args '-v /root/.m2/repository:/root/.m2/repository'
               reuseNode true
             }
-
           }
           steps {
             sh ' mvn sonar:sonar -Dsonar.host.url=http://10.66.12.219:9000'
           }
         }
-
       }
     }
-
-  }
-  options {
-    skipDefaultCheckout()
-  }
-}
+ }
