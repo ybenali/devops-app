@@ -16,6 +16,13 @@ pipeline {
         }
 
       }
+      
+       when {
+          anyOf {
+            branch 'develop'
+          }
+
+        }
       steps {
         sh ' mvn clean compile'
       }
@@ -146,6 +153,12 @@ pipeline {
         }
 
       }
+       when {
+          anyOf {
+            branch 'develop'
+          }
+
+        }
       post {
         always {
           junit 'target/surefire-reports/**/*.xml'
