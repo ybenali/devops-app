@@ -160,8 +160,6 @@ pipeline {
         sh 'mvn verify -Dsurefire.skip=true'
       }
     }
-
    
-   }
  }
 }
