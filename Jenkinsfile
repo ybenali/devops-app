@@ -31,11 +31,7 @@ pipeline {
               reuseNode true
             }
           }
-         when {
-          anyOf {
-            branch 'develop'
-          }
-         }
+         
           
           steps {
             sh ' mvn checkstyle:checkstyle'
@@ -58,11 +54,7 @@ pipeline {
               reuseNode true
             }
           }
-          when {
-          anyOf {
-            branch 'develop'
-          }
-         }
+          
           steps {
             sh ' mvn pmd:pmd'
             step([$class: 'PmdPublisher', pattern: '**/target/pmd.xml'])
@@ -93,11 +85,7 @@ pipeline {
             }
 
           }
-          when {
-          anyOf {
-            branch 'develop'
-          }
-         }
+         
           steps {
             sh ' mvn javadoc:javadoc'
             step([$class: 'JavadocArchiver', javadocDir: './target/site/apidocs', keepAll: 'true'])
