@@ -41,13 +41,13 @@ pipeline {
           steps {
             sh ' mvn checkstyle:checkstyle'
             step([$class: 'CheckStylePublisher',
-                                                                               //canRunOnFailed: true,
-                                                                               defaultEncoding: '',
-                                                                               healthy: '100',
-                                                                               pattern: '**/target/checkstyle-result.xml',
-                                                                               unHealthy: '90',
-                                                                               //useStableBuildAsReference: true
-                                                                              ])
+                                                                                           //canRunOnFailed: true,
+                                                                                           defaultEncoding: '',
+                                                                                           healthy: '100',
+                                                                                           pattern: '**/target/checkstyle-result.xml',
+                                                                                           unHealthy: '90',
+                                                                                           //useStableBuildAsReference: true
+                                                                                          ])
           }
         }
 
@@ -192,7 +192,10 @@ pipeline {
 cd  /var/jenkins_home/workspace/devops-app_main/target
             git add -f demo-0.0.1-SNAPSHOT.war
             git commit -m "Push war file"
-            git push -u \'youssef.benali@altersis.com\' -p \'usefBA29!\' test  main
+#           git push -u \'youssef.benali@altersis.com\' -p \'usefBA29!\' test  main
+
+
+git push https://ybenali@github.com/ybenali/devops-app.git
             '''
       }
     }
