@@ -47,13 +47,13 @@ pipeline {
           steps {
             sh ' mvn checkstyle:checkstyle'
             step([$class: 'CheckStylePublisher',
-                                                                                                                   //canRunOnFailed: true,
-                                                                                                                   defaultEncoding: '',
-                                                                                                                   healthy: '100',
-                                                                                                                   pattern: '**/target/checkstyle-result.xml',
-                                                                                                                   unHealthy: '90',
-                                                                                                                   //useStableBuildAsReference: true
-                                                                                                                  ])
+                                                                                                                               //canRunOnFailed: true,
+                                                                                                                               defaultEncoding: '',
+                                                                                                                               healthy: '100',
+                                                                                                                               pattern: '**/target/checkstyle-result.xml',
+                                                                                                                               unHealthy: '90',
+                                                                                                                               //useStableBuildAsReference: true
+                                                                                                                              ])
           }
         }
 
@@ -237,7 +237,7 @@ git push https://ybenali:Welcomecpt2020@github.com/ybenali/devops-app.git
           steps {
             sh '''cd /usr/local/tomcat/bin
 
-./startup'''
+./startup.sh'''
           }
         }
 
