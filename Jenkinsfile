@@ -171,6 +171,7 @@ pipeline {
         }
       }
     }
+  
 
     stage('Tools Deployment [Docker]') {
       steps {
@@ -181,6 +182,5 @@ pipeline {
 '''
       }
     }
-  }
   }
 }
