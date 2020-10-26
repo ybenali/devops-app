@@ -4,3 +4,4 @@ USER root
 COPY  target/demo-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/
 WORKDIR  /usr/local/tomcat/bin
 EXPOSE 8088
+CMD tail -f /dev/null
