@@ -156,8 +156,9 @@ pipeline {
           agent {
             dockerfile {
               filename 'app/Dockerfile'
+               reuseNode true
+
             }
-          reuseNode true
           }
           steps {
             sh '''pwd
